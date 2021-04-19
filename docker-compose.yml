@@ -1,0 +1,26 @@
+version: "3"
+services:
+  db:
+    image: mysql:8.0
+    #envfile: .env.mysql.production
+    env_file: .env.mysql.development
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./containers/mysql/conf.d:/etc/mysql/conf.d
+      - mysql_data:/var/lib/mysql
+  web:
+    build: .
+    command: bash -c "rm -f /sample/tmp/pids/server.pid; bundle exec rails s -p 3000 -b 0.0.0.0"
+    #env_file: .env.production
+    env_file: .env.development
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/sample
+    depends_on:
+      - db
+    stdin_open: true
+    tty: true
+volumes:
+  mysql_data:
